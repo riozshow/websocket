@@ -1,3 +1,7 @@
+const socket = io();
+
+socket.on('message', ({ author, content }) => addMessage(author, content));
+
 const loginForm = document.querySelector('#welcome-form');
 const userNameInput = document.querySelector('#username');
 
@@ -28,13 +32,22 @@ function login() {
   window.userName = userNameInput.value;
   loginForm.classList.toggle('show', false);
   messagesSection.classList.toggle('show', true);
+
+  socket.emit('login', { name: window.userName });
 }
 
 function sendMessage() {
   if (isEmpty(messageContentInput)) {
     return alert('Message field cannot be empty');
   }
-  addMessage(window.userName, messageContentInput.value);
+
+  const author = window.userName;
+  const content = messageContentInput.value;
+
+  addMessage(author, content);
+
+  socket.emit('message', { author, content });
+
   messageContentInput.value = '';
 }
 
